@@ -6,6 +6,10 @@ use clap::{App, Arg};
 
 use crate::exercises::{self, Exercise};
 
+/// Get desired exercises and input files via a CLI
+/// The user gives a filename for the input for each exercise to be run
+/// A map of day number to tuple(exercise, input data) is returned, where the input data is
+/// read from the file specified in the command line arguments
 pub fn cli_get_exercises() -> HashMap<u32, (Box<dyn Exercise>, String)> {
   let mut app = App::new("Advent of Code 2021")
     .version("1.0")

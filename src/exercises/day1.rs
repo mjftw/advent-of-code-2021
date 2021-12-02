@@ -1,7 +1,6 @@
-//! [Advent of Code - Day 1](https://adventofcode.com/2021/day/1)
-
 use super::Exercise;
 
+///[Advent of Code - Day 1](https://adventofcode.com/2021/day/1)
 pub struct Day1;
 
 fn parse_input(raw_input: &str) -> Vec<u32> {
