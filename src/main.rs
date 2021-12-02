@@ -1,11 +1,10 @@
 mod cli;
-mod day1;
+mod exercises;
 
 fn main() {
-    let day_inputs = cli::cli_get_day_inputs();
+    let exercises = cli::cli_get_exercises();
 
-    if let Some(raw_input) = day_inputs.get(&1) {
-        let input = day1::parse_input(raw_input);
-        println!("Day 1 answer: {}", day1::solve(&input));
+    for (day, (ex, input)) in exercises {
+        println!("Day {} solution: {}", day, ex.solve(&input));
     }
 }
