@@ -16,19 +16,19 @@ pub fn cli_get_exercises() -> HashMap<u32, (Box<dyn Exercise>, String)> {
     .author("Merlin Webster <mjftwebster@gmail.com>")
     .about("Solves exercises from the Advent of Code challenge 2021");
 
-  let exs = exercises::exercises();
-  let exercise_days = exs.keys();
+  // Bug: day_args not sorted
+  let day_args: HashMap<u32, String> =
+    exercises::exercises()
+      .iter()
+      .fold(HashMap::new(), |mut hm, (day, _)| {
+        hm.insert(*day, format!("day{}", *day));
+        hm
+      });
 
-  let args: Vec<String> = exercise_days
-    .clone()
-    .map(|day| format!("day{}", day))
-    .collect();
-
-  app = exercise_days.clone().fold(app, |app, day| {
-    let arg_name = args.get((*day - 1) as usize).unwrap();
+  app = day_args.values().fold(app, |app, arg| {
     app.arg(
-      Arg::with_name(arg_name)
-        .long(arg_name)
+      Arg::with_name(arg)
+        .long(arg)
         .value_name("INPUT_FILENAME")
         .takes_value(true),
     )
@@ -42,12 +42,12 @@ pub fn cli_get_exercises() -> HashMap<u32, (Box<dyn Exercise>, String)> {
   }
 
   let mut day_inputs = HashMap::new();
-  let mut exercises = exercises::exercises();
 
-  for day in exercise_days {
-    if let Some(filename) = matches.value_of(args.get((*day - 1) as usize).unwrap()) {
+  for (day, exercise) in exercises::exercises() {
+    //Bug: day_args.get() assumes day_args are sorted
+    if let Some(filename) = matches.value_of(day_args.get(&day).unwrap()) {
       match fs::read_to_string(filename) {
-        Ok(input) => day_inputs.insert(*day, (exercises.remove(day).unwrap(), input)),
+        Ok(input) => day_inputs.insert(day, (exercise, input)),
         Err(err) => panic!("Failed to read file {}: {}", filename, err),
       };
     }
