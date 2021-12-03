@@ -3,20 +3,21 @@ use super::Exercise;
 ///[Advent of Code - Day 2](https://adventofcode.com/2021/day/2)
 pub struct Day2;
 
+#[derive(Copy, Clone)]
 enum Command {
   Up(u32),
   Down(u32),
   Forward(u32),
 }
 
-struct Location {
-  horizontal: u32,
-  depth: u32,
+struct LocationP1 {
+  horizontal: i32,
+  depth: i32,
 }
 
-impl Location {
+impl LocationP1 {
   pub fn new() -> Self {
-    Location {
+    LocationP1 {
       horizontal: 0,
       depth: 0,
     }
@@ -24,22 +25,60 @@ impl Location {
 
   pub fn translate(self, command: &Command) -> Self {
     match command {
-      Command::Up(distance) => Location {
-        depth: self.depth - distance,
+      Command::Up(distance) => LocationP1 {
+        depth: self.depth - (*distance as i32),
         ..self
       },
-      Command::Down(distance) => Location {
-        depth: self.depth + distance,
+      Command::Down(distance) => LocationP1 {
+        depth: self.depth + (*distance as i32),
         ..self
       },
-      Command::Forward(distance) => Location {
-        horizontal: self.horizontal + distance,
+      Command::Forward(distance) => LocationP1 {
+        horizontal: self.horizontal + (*distance as i32),
         ..self
       },
     }
   }
 
-  pub fn summary(&self) -> u32 {
+  pub fn summary(&self) -> i32 {
+    self.horizontal * self.depth
+  }
+}
+
+struct LocationP2 {
+  horizontal: i32,
+  depth: i32,
+  aim: i32,
+}
+
+impl LocationP2 {
+  pub fn new() -> Self {
+    LocationP2 {
+      horizontal: 0,
+      depth: 0,
+      aim: 0,
+    }
+  }
+
+  pub fn translate(self, command: &Command) -> Self {
+    match command {
+      Command::Up(amount) => LocationP2 {
+        aim: self.aim - (*amount as i32),
+        ..self
+      },
+      Command::Down(amount) => LocationP2 {
+        aim: self.aim + (*amount as i32),
+        ..self
+      },
+      Command::Forward(amount) => LocationP2 {
+        horizontal: self.horizontal + (*amount as i32),
+        depth: self.depth + (self.aim * (*amount as i32)),
+        ..self
+      },
+    }
+  }
+
+  pub fn summary(&self) -> i32 {
     self.horizontal * self.depth
   }
 }
@@ -112,10 +151,24 @@ impl Exercise for Day2 {
   fn solve(&self, raw_input: &str) -> String {
     let commands = parse_input(raw_input);
 
-    let location = commands.iter().fold(Location::new(), |location, command| {
-      location.translate(command)
-    });
+    let location_part_1 = commands
+      .clone()
+      .iter()
+      .fold(LocationP1::new(), |location, command| {
+        location.translate(command)
+      });
 
-    format!("{}", location.summary())
+    let location_part_2 = commands
+      .clone()
+      .iter()
+      .fold(LocationP2::new(), |location, command| {
+        location.translate(command)
+      });
+
+    format!(
+      "Part1 = {}, Part2 = {}",
+      location_part_1.summary(),
+      location_part_2.summary()
+    )
   }
 }
